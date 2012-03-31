@@ -10,23 +10,27 @@ let parseFieldSize(header:string) =
         
 
 let countProximity(row, line: string, mineField: list<string>) =
+    let inRange (a, b) = a >= 0 && b >= 0 && a < mineField.Length && b < line.Length
     let explosive c = if c = '*' then 1 else 0
-    let neighbours x y = 
+    let binaryExplosive (a, b) = mineField.Item(a).Chars(b) |> explosive
+
+    let totalExplosiveNeighbours x y = 
         [(x-1, y-1); (x-1, y); (x-1, y+1); 
          (x, y-1); (x, y+1); 
          (x+1, y-1); (x+1, y); (x+1, y+1)]
-            |> List.filter (fun (a , b) -> a >= 0 && b >= 0 && a < mineField.Length && b < line.Length )
-            |> List.map (fun (a, b) -> mineField.Item(a).Chars(b) |> explosive)
+            |> List.filter inRange
+            |> List.map binaryExplosive
             |> List.sum
+            |> (fun i -> i.ToString().Chars(0))
 
-    let mapete col c = if c = '.' then (neighbours row col).ToString().Chars(0) else c
+    let mapete col c = if c = '.' then (totalExplosiveNeighbours row col) else c
 
     String.mapi mapete line 
 
 let fillProximity(counter:int, rows, cols, mineField) =
-    let header = String.Format("Field #{0}", counter) 
-    let output = mineField |> List.mapi (fun row line -> countProximity(row, line, mineField))
-    header :: output |> String.concat "\n"
+    let header = sprintf "Field #%d" counter
+    let filled = mineField |> List.mapi (fun row line -> countProximity(row, line, mineField))
+    header :: filled |> String.concat "\n"
 
 
 let rec createOutput counter lines =
@@ -42,8 +46,10 @@ let rec createOutput counter lines =
 let minesweep (fields:string) = 
     fields.Split('\n') 
         |> Array.toList
-        |> fun l -> createOutput 1 l
-        |> String.concat "\n"
+        |> createOutput 1
+        |> String.concat "\n\n"
+    
+
         
     
 

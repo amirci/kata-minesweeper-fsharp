@@ -23,3 +23,31 @@ let ``When passing two rows``() =
     |> It should equal (["Field #1"; "*20"; "*20" ] |> String.concat "\n")
     |> Verify                       
 
+[<Scenario>]
+let ``When passing suggested cases``() =
+  let expected = ["Field #1"; 
+                  "*100"    ; 
+                  "2210"    ; 
+                  "1*10"    ; 
+                  "1110"    ;
+                  "\n"      ;
+                  "Field #2"; 
+                  "**100"   ; 
+                  "33200"   ; 
+                  "1*100"   ] |> String.concat "\n" 
+
+  Given ["4 4"  ; 
+         "*..." ; 
+         "...." ; 
+         ".*.." ; 
+         "...." ;
+         "3 5"  ; 
+         "**..."; 
+         "....."; 
+         ".*...";
+         "0 0"  ] |> String.concat "\n" 
+    |> When minesweeping           
+    |> It should equal (expected.Replace("\n\n", "\n"))
+    |> Verify                       
+
+    
