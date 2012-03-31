@@ -9,9 +9,21 @@ let parseFieldSize(header:string) =
     | a::b::_ -> (Int32.Parse a, Int32.Parse b)
         
 
+let countProximity(row, line, mineField) =
+    let neighbours x y = 
+        [1; 2; 3]
+
+    let mapete col c =
+        match c with
+        | '.' -> List.sum(neighbours row col).ToString().Chars(0)
+        | _   -> c
+
+    line |> String.mapi(mapete)
+
 let fillProximity(counter:int, rows, cols, mineField) =
-    String.Format("Field #{0}", counter) :: ["*10"]
-        |> String.concat "\n"
+    let header = String.Format("Field #{0}", counter) 
+    let output = mineField |> List.mapi (fun row line -> countProximity(row, line, mineField))
+    header :: output |> String.concat "\n"
 
 
 let rec createOutput(counter, lines) =
